@@ -105,16 +105,19 @@ O sistema implementa controlo de acesso baseado em roles:
 
 ## 5. Containerização com Docker
 
-A aplicação foi containerizada com Docker, utilizando dois containers:
-
 ### 5.1 Estrutura
-docker-compose.yml
-├── mysql (mysql:8.0)
-│   ├── Porta: 3307:3306
-│   └── Volume: mysql_data + init.sql
-└── api (node:20-alpine)
-├── Porta: 3000:3000
-└── Depende do mysql
+A aplicação é composta por dois containers definidos no `docker-compose.yml`:
+
+**Container MySQL:**
+- Imagem: `mysql:8.0`
+- Porta: `3307:3306`
+- Volume persistente: `mysql_data`
+- Inicialização automática com `init.sql`
+
+**Container API:**
+- Imagem: `node:20-alpine`
+- Porta: `3000:3000`
+- Depende do container MySQL
 
 ### 5.2 Imagens no DockerHub
 
@@ -163,35 +166,21 @@ docker-compose up --build
 ---
 
 ## 8. Estrutura do Projeto
-asset-management/
-├── database/
-│   └── init.sql
-├── docs/
-│   └── README.md
-├── src/
-│   ├── config/
-│   │   └── database.js
-│   ├── controllers/
-│   │   ├── authController.js
-│   │   ├── assetsController.js
-│   │   ├── categoriesController.js
-│   │   └── inspectionsController.js
-│   ├── middleware/
-│   │   └── auth.js
-│   └── routes/
-│       ├── auth.js
-│       ├── assets.js
-│       ├── categories.js
-│       └── inspections.js
-├── .dockerignore
-├── .env
-├── .gitignore
-├── docker-compose.yml
-├── Dockerfile
-├── index.js
-├── package.json
-├── postman_collection.json
-└── swagger.yaml
+
+- **database/** — Script SQL de inicialização da base de dados
+- **docs/** — Relatório do projeto
+- **src/config/** — Configuração da ligação à base de dados
+- **src/controllers/** — Lógica de negócio de cada recurso (auth, assets, categories, inspections)
+- **src/middleware/** — Middleware de autenticação JWT
+- **src/routes/** — Definição das rotas da API
+- **.dockerignore** — Ficheiros ignorados pelo Docker
+- **.gitignore** — Ficheiros ignorados pelo Git
+- **docker-compose.yml** — Configuração dos dois containers
+- **Dockerfile** — Configuração da imagem da API
+- **index.js** — Ponto de entrada da aplicação
+- **package.json** — Dependências do projeto
+- **postman_collection.json** — Collection para testes no Postman
+- **swagger.yaml** — Documentação OpenAPI 3.0
 
 ---
 
