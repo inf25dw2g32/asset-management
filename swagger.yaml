@@ -1,0 +1,248 @@
+openapi: 3.0.0
+info:
+  title: Asset Management API
+  description: API REST para gestão de assets de TI e segurança (ISO 27001)
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de desenvolvimento
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Asset:
+      type: object
+      properties:
+        id:
+          type: integer
+        category_id:
+          type: integer
+        name:
+          type: string
+        serial_number:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        location:
+          type: string
+        status:
+          type: string
+          enum: [active, inactive, maintenance, disposed]
+        criticality:
+          type: string
+          enum: [low, medium, high, critical]
+        notes:
+          type: string
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+
+    Inspection:
+      type: object
+      properties:
+        id:
+          type: integer
+        asset_id:
+          type: integer
+        type:
+          type: string
+          enum: [audit, maintenance, security_check, inventory]
+        result:
+          type: string
+          enum: [pass, fail, pending, not_applicable]
+        score:
+          type: integer
+        findings:
+          type: string
+        recommendations:
+          type: string
+        next_review:
+          type: string
+          format: date
+
+security:
+  - bearerAuth: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login efetuado com sucesso
+        '401':
+          description: Credenciais inválidas
+
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registar utilizador
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                role:
+                  type: string
+                  enum: [admin, auditor, technician]
+      responses:
+        '201':
+          description: Utilizador criado com sucesso
+
+  /categories:
+    get:
+      tags: [Categories]
+      summary: Listar todas as categorias
+      responses:
+        '200':
+          description: Lista de categorias
+    post:
+      tags: [Categories]
+      summary: Criar categoria
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '201':
+          description: Categoria criada com sucesso
+
+  /categories/{id}:
+    get:
+      tags: [Categories]
+      summary: Obter categoria por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria encontrada
+        '404':
+          description: Categoria não encontrada
+    put:
+      tags: [Categories]
+      summary: Atualizar categoria
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Category'
+      responses:
+        '200':
+          description: Categoria atualizada
+    delete:
+      tags: [Categories]
+      summary: Eliminar categoria
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Categoria eliminada
+
+  /assets:
+    get:
+      tags: [Assets]
+      summary: Listar todos os assets
+      responses:
+        '200':
+          description: Lista de assets
+    post:
+      tags: [Assets]
+      summary: Criar asset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '201':
+          description: Asset criado com sucesso
+
+  /assets/my:
+    get:
+      tags: [Assets]
+      summary: Listar os meus assets
+      responses:
+        '200':
+          description: Lista de assets do utilizador autenticado
+
+  /assets/{id}:
+    get:
+      tags: [Assets]
+      summary: Obter asset por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Asset encontrado
+        '404':
+          description: Asset não encontrado
+    put:
+      tags: [Assets]
+      summary: Atualizar asset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
